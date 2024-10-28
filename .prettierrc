@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "semi": false,
+  "overrides": [
+    {
+      "files": "*.handlebars",
+      "options": {
+        "singleQuote": false,
+        "parser": "html"
+      }
+    }
+  ]
+}
