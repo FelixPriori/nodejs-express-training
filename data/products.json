@@ -1,5 +1,1 @@
-[
-  { "title": "A First Book" },
-  { "title": "A Second Book" },
-  { "title": "A Third Book" }
-]
+[{"title":"A First Book","imageUrl":"https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png","price":19.99,"description":"A very interesting book about so many even more interesting things!"},{"title":"A Second Book Book","imageUrl":"https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png","price":2.59,"description":"This book kinda sucks!"},{"title":"A Third Book","imageUrl":"https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png","description":"This third book is somewhat interesting.","price":"12.01"}]
