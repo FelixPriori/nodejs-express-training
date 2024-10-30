@@ -3,37 +3,45 @@ const Cart = require('../models/cart')
 const { productNotFound } = require('./error')
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render('shop/product-list', {
-      products,
-      pageTitle: 'Shop',
-      path: '/',
+  Product.fetchAll()
+    .then(([products]) => {
+      res.render('shop/product-list', {
+        products,
+        pageTitle: 'Shop',
+        path: '/',
+      })
     })
-  })
+    .catch(console.error)
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render('shop/product-list', {
-      products,
-      pageTitle: 'All Products',
-      path: '/products',
+  Product.fetchAll()
+    .then(([products]) => {
+      res.render('shop/product-list', {
+        products,
+        pageTitle: 'Shop',
+        path: '/products',
+      })
     })
-  })
+    .catch(console.error)
 }
 
 exports.getProduct = (req, res, next) => {
-  Product.fetchById(req.params.productId, (product) => {
-    if (!product) {
-      productNotFound(res)
-    }
+  Product.fetchById(req.params.productId)
+    .then(([rows]) => {
+      const [product] = rows
 
-    res.render('shop/product-details', {
-      product,
-      pageTitle: product.title,
-      path: '/products',
+      if (!product) {
+        productNotFound(res)
+      }
+
+      res.render('shop/product-details', {
+        product,
+        pageTitle: product.title,
+        path: '/products',
+      })
     })
-  })
+    .catch(console.error)
 }
 
 exports.getCart = (req, res, next) => {
@@ -60,7 +68,6 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const productId = req.body.productId
-  console.log({ productId })
   Product.fetchById(productId, (product) => {
     if (!product) {
       productNotFound(res)
