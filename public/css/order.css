@@ -1,0 +1,38 @@
+.orders__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.orders__list-item {
+  padding: 1rem 2rem;
+  border: 1px solid #00695c;
+  border-radius: 3px;
+}
+
+.orders__list-item:not(:last-of-type) {
+  margin-bottom: 2rem;
+}
+
+.order__title {
+  text-align: center;
+}
+
+.order__product-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.order__product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2rem;
+}
+
+.order__product-item-title {
+}
+
+.order__product-item-price {
+}

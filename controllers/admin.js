@@ -1,4 +1,3 @@
-const Product = require('../models/product')
 const { productNotFound } = require('./error')
 
 exports.getAddProducts = (req, res, next) => {
@@ -16,16 +15,28 @@ exports.getAddProducts = (req, res, next) => {
 }
 
 exports.postAddProduct = (req, res, next) => {
-  const title = req.body.title
+  const { title, description, price } = req.body
   const imageUrl =
     'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
   // const imageUrl = req.body.imageUrl
-  const description = req.body.description
-  const price = req.body.price
-  const product = new Product(null, title, imageUrl, description, price)
-  product
-    .save()
-    .then(() => {
+  /* WITHOUT SEQUELIZE */
+  // const product = new Product(null, title, imageUrl, description, price)
+  // product
+  //   .save()
+  //   .then(() => {
+  //     return res.redirect('/admin/products')
+  //   })
+  //   .catch(console.error)
+  /* WITH SEQUELIZE */
+  req.user
+    .createProduct({
+      title,
+      price,
+      description,
+      imageUrl,
+      userId: req.user.id,
+    })
+    .then((result) => {
       return res.redirect('/admin/products')
     })
     .catch(console.error)
@@ -38,50 +49,63 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/admin/products')
   }
 
-  const productId = req.params.productId
+  const { productId } = req.params
 
-  Product.fetchById(productId, (product) => {
-    if (!product) {
-      productNotFound(res)
-    }
+  req.user
+    .getProducts({ where: { id: productId } })
+    .then(([product]) => {
+      if (!product) {
+        productNotFound(res)
+      }
 
-    res.render('admin/edit-product', {
-      product,
-      pageTitle: 'Edit Product',
-      path: '/admin/products',
-      editing: editMode,
+      res.render('admin/edit-product', {
+        product,
+        pageTitle: 'Edit Product',
+        path: '/admin/products',
+        editing: editMode,
+      })
     })
-  })
+    .catch(console.error)
 }
 
 exports.postEditProduct = (req, res, next) => {
-  const productId = req.body.productId
-  const title = req.body.title
-  const imageUrl =
-    'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
-  // const imageUrl = req.body.imageUrl
-  const description = req.body.description
-  const price = req.body.price
+  const { productId } = req.body
 
-  const updatedProduct = new Product(
-    productId,
-    title,
-    imageUrl,
-    description,
-    price
-  )
-  updatedProduct.save()
-  res.redirect('/admin/products')
+  req.user
+    .getProducts({ where: { id: productId } })
+    .then(([product]) => {
+      const { productId, title, description, price } = req.body
+      const imageUrl =
+        'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
+      product.title = title
+      product.description = description
+      product.imageUrl = imageUrl
+      product.price = price
+      return product.save()
+    })
+    .then(() => {
+      res.redirect('/admin/products')
+    })
+    .catch(console.error)
 }
 
 exports.postDeleteProduct = (req, res, next) => {
-  Product.deleteById(req.body.productId)
-  res.redirect('/admin/products')
+  const { productId } = req.body
+  req.user
+    .getProducts({ where: { id: productId } })
+    .then(([product]) => {
+      return product.destroy()
+    })
+    .then(() => {
+      res.redirect('/admin/products')
+    })
+    .catch(console.error)
 }
 
 exports.getAdminProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then(([products]) => {
+  req.user
+    .getProducts()
+    .then((products) => {
       res.render('admin/products', {
         products,
         pageTitle: 'Products',
