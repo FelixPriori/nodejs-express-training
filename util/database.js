@@ -1,26 +1,28 @@
-/* WITHOUT SEQUELIZE */
-// const mysql = require('mysql2')
+const { MongoClient } = require('mongodb')
 
-// const pool = mysql.createPool({
-//   host: process.env.MYSQL_HOST,
-//   user: process.env.MYSQL_USER,
-//   database: process.env.MYSQL_DB_NAME,
-//   password: process.env.MYSQL_ROOT_PASSWORD,
-// })
+let _db
 
-// module.exports = pool.promise()
+const mongoConnect = (callback) => {
+  const uri = process.env.MONGO_URI
+  const client = new MongoClient(uri)
+  // const dbName = 'admin'
+  client
+    .connect()
+    .then((client) => {
+      console.log('You successfully connected to MongoDB!')
+      _db = client.db()
+      callback()
+    })
+    .catch(console.error)
+}
 
-/* WITH SEQUELIZE */
-const { Sequelize } = require('sequelize')
-
-const sequelize = new Sequelize(
-  process.env.MYSQL_DB_NAME,
-  process.env.MYSQL_USER,
-  process.env.MYSQL_ROOT_PASSWORD,
-  {
-    host: process.env.MYSQL_HOST,
-    dialect: 'mysql',
+const getDb = () => {
+  if (_db) {
+    return _db
+  } else {
+    throw new Error('No database found.')
   }
-)
+}
 
-module.exports = sequelize
+exports.mongoConnect = mongoConnect
+exports.getDb = getDb

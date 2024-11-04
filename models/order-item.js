@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize')
 
-const sequelize = require('../util/database')
+const sequelize = require('../util/mySqlDb')
 
 const OrderItem = sequelize.define('orderItem', {
   id: {
