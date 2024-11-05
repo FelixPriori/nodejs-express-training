@@ -1,9 +1,10 @@
 const Product = require('../models/product')
+const Order = require('../models/order')
 const { productNotFound } = require('./error')
 
 exports.getIndex = (req, res, next) => {
-  /* WITH MONGODB */
-  Product.fetchAll()
+  /* WITH MONGOOSE */
+  Product.find()
     .then((products) => {
       res.render('shop/product-list', {
         products,
@@ -12,6 +13,17 @@ exports.getIndex = (req, res, next) => {
       })
     })
     .catch(console.error)
+
+  /* WITH MONGODB */
+  // Product.fetchAll()
+  //   .then((products) => {
+  //     res.render('shop/product-list', {
+  //       products,
+  //       pageTitle: 'Shop',
+  //       path: '/',
+  //     })
+  //   })
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // Product.findAll()
@@ -26,8 +38,8 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getProducts = (req, res, next) => {
-  /* WITH MONGODB */
-  Product.fetchAll()
+  /* WITH MONGOOSE */
+  Product.find()
     .then((products) => {
       res.render('shop/product-list', {
         products,
@@ -36,6 +48,17 @@ exports.getProducts = (req, res, next) => {
       })
     })
     .catch(console.error)
+
+  /* WITH MONGODB */
+  // Product.fetchAll()
+  //   .then((products) => {
+  //     res.render('shop/product-list', {
+  //       products,
+  //       pageTitle: 'Shop',
+  //       path: '/products',
+  //     })
+  //   })
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // Product.findAll()
@@ -51,6 +74,8 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const { productId } = req.params
+
+  /* WITH MONGODB */
   Product.findById(productId)
     .then((product) => {
       if (!product) {
@@ -82,8 +107,12 @@ exports.getProduct = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   /* WITH MONGODB */
   req.user
-    .getCart()
-    .then((products) => {
+    .populate('cart.items.productId')
+    .then((user) => {
+      const products = user.cart.items.map((product) => ({
+        quantity: product.quantity,
+        ...product.productId._doc,
+      }))
       res.render('shop/cart', {
         products,
         pageTitle: 'Cart',
@@ -182,17 +211,26 @@ exports.getCheckout = (req, res, next) => {
 }
 
 exports.getOrders = (req, res, next) => {
-  /* WITH MONGODB */
-  req.user
-    .getOrders()
-    .then((orders) => {
-      res.render('shop/orders', {
-        orders,
-        pageTitle: 'Your Orders',
-        path: '/orders',
-      })
+  /* WITH MONGOOSE */
+  Order.find({ 'user.userId': req.user._id }).then((orders) => {
+    res.render('shop/orders', {
+      orders,
+      pageTitle: 'Your Orders',
+      path: '/orders',
     })
-    .catch(console.error)
+  })
+
+  /* WITH MONGODB */
+  // req.user
+  //   .getOrders()
+  //   .then((orders) => {
+  //     res.render('shop/orders', {
+  //       orders,
+  //       pageTitle: 'Your Orders',
+  //       path: '/orders',
+  //     })
+  //   })
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // req.user
@@ -208,11 +246,34 @@ exports.getOrders = (req, res, next) => {
 }
 
 exports.postOrder = (req, res, next) => {
-  /* WITH MONGODB */
+  /* WITH MONGOOSE */
   req.user
-    .addOrder()
+    .populate('cart.items.productId')
+    .then((user) =>
+      user.cart.items.map((product) => ({
+        quantity: product.quantity,
+        productData: { ...product.productId._doc },
+      }))
+    )
+    .then((products) => {
+      const order = new Order({
+        products,
+        user: {
+          name: req.user.name,
+          userId: req.user,
+        },
+      })
+      return order.save()
+    })
+    .then(() => req.user.clearCart())
     .then(() => res.redirect('/orders'))
     .catch(console.error)
+
+  /* WITH MONGODB */
+  // req.user
+  //   .addOrder()
+  //   .then(() => res.redirect('/orders'))
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // let fetchedCart

@@ -21,6 +21,37 @@ exports.postAddProduct = (req, res, next) => {
     'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
   // const imageUrl = req.body.imageUrl
 
+  /* WITH MONGOOSE */
+  const product = new Product({
+    title,
+    price,
+    description,
+    imageUrl,
+    userId: req.user,
+  })
+  product
+    .save()
+    .then(() => {
+      return res.redirect('/admin/products')
+    })
+    .catch(console.error)
+
+  /* WITH MONGODB */
+  // const product = new Product(
+  //   title,
+  //   price,
+  //   description,
+  //   imageUrl,
+  //   null,
+  //   req.user._id
+  // )
+  // product
+  //   .save()
+  //   .then(() => {
+  //     return res.redirect('/admin/products')
+  //   })
+  //   .catch(console.error)
+
   /* WITHOUT SEQUELIZE */
   // const product = new Product(null, title, imageUrl, description, price)
   // product
@@ -42,22 +73,6 @@ exports.postAddProduct = (req, res, next) => {
   //     return res.redirect('/admin/products')
   //   })
   //   .catch(console.error)
-
-  /* WITH MONGODB */
-  const product = new Product(
-    title,
-    price,
-    description,
-    imageUrl,
-    null,
-    req.user._id
-  )
-  product
-    .save()
-    .then(() => {
-      return res.redirect('/admin/products')
-    })
-    .catch(console.error)
 }
 
 exports.getEditProduct = (req, res, next) => {
@@ -104,17 +119,30 @@ exports.getEditProduct = (req, res, next) => {
 }
 
 exports.postEditProduct = (req, res, next) => {
-  /* WITH MONGODB */
   const { productId, title, description, price } = req.body
   const imageUrl =
     'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
-  const product = new Product(title, price, description, imageUrl, productId)
-  product
-    .save()
-    .then(() => {
-      res.redirect('/admin/products')
+
+  /* WITH MONGOOSE */
+  Product.findById(productId)
+    .then((product) => {
+      product.title = title
+      product.price = price
+      product.description = description
+      product.imageUrl = imageUrl
+      return product.save()
     })
+    .then(() => res.redirect('/admin/products'))
     .catch(console.error)
+
+  /* WITH MONGODB */
+  // const product = new Product(title, price, description, imageUrl, productId)
+  // product
+  //   .save()
+  //   .then(() => {
+  //     res.redirect('/admin/products')
+  //   })
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // const { productId } = req.body
@@ -139,12 +167,19 @@ exports.postEditProduct = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
   const { productId } = req.body
 
-  /* WITH MONGODB */
-  Product.deleteById(productId)
+  /* WITH MONGOOSE */
+  Product.findByIdAndDelete(productId)
     .then(() => {
       res.redirect('/admin/products')
     })
     .catch(console.error)
+
+  /* WITH MONGODB */
+  // Product.deleteById(productId)
+  //   .then(() => {
+  //     res.redirect('/admin/products')
+  //   })
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // req.user
@@ -159,8 +194,8 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getAdminProducts = (req, res, next) => {
-  /* WITH MONGODB */
-  Product.fetchAll()
+  /* WITH MONGOOSE */
+  Product.find()
     .then((products) => {
       res.render('admin/products', {
         products,
@@ -169,6 +204,17 @@ exports.getAdminProducts = (req, res, next) => {
       })
     })
     .catch(console.error)
+
+  /* WITH MONGODB */
+  // Product.fetchAll()
+  //   .then((products) => {
+  //     res.render('admin/products', {
+  //       products,
+  //       pageTitle: 'Products',
+  //       path: '/admin/products',
+  //     })
+  //   })
+  //   .catch(console.error)
 
   /* WITH SEQUELIZE */
   // req.user

@@ -21,7 +21,13 @@ app.set('views', 'views')
 // const app = express()
 // app.set('view engine', 'pug')
 // app.set('views', 'views')
-const { mongoConnect } = require('./util/database')
+
+/* USING MONGODB */
+// const { mongoConnect } = require('./util/database')
+// const User = require('./models/user')
+
+/* USING MONGOOSE */
+const mongoose = require('mongoose')
 const User = require('./models/user')
 
 const adminRoutes = require('./routes/admin')
@@ -42,14 +48,24 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use((req, res, next) => {
-  /* USING MONGODB */
-  const userId = '6728e4e9215d9bba56c99554'
+  /* USING MONGOOSE */
+  const userId = '672a37f0e2906079a18b4ee0'
   User.findById(userId)
     .then((user) => {
-      req.user = new User(user.name, user.email, user.cart, user._id)
+      req.user = user
       next()
     })
     .catch(console.error)
+
+  /* USING MONGODB */
+  // const userId = '6728e4e9215d9bba56c99554'
+  // User.findById(userId)
+  //   .then((user) => {
+  //     req.user = new User(user.name, user.email, user.cart, user._id)
+  //     next()
+  //   })
+  //   .catch(console.error)
+
   /* USING SEQUELIZE */
   // User.findByPk(1)
   //   .then((user) => {
@@ -94,6 +110,26 @@ app.use(shopRoutes)
 app.use(errorController.pageNotFound)
 
 /* USING MONGODB */
-mongoConnect(() => {
-  app.listen(3000)
-})
+// mongoConnect(() => {
+//   app.listen(3000)
+// })
+
+/* USING MONGOOSE */
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: 'Felix',
+          email: 'felix@example.com',
+          cart: {
+            items: [],
+          },
+        })
+        user.save()
+      }
+    })
+    app.listen(3000)
+  })
+  .catch(console.error)
