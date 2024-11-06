@@ -3,11 +3,21 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
+const { doubleCsrf: csrf } = require('csrf-csrf')
+const cookieParser = require('cookie-parser')
+const flash = require('connect-flash')
 
 const app = express()
 const store = new MongoDBStore({
   uri: process.env.MONGO_URI,
   collection: 'sessions',
+})
+
+const csrfProtection = csrf({
+  getSecret: () => 'supersecret',
+  getTokenFromRequest: (req) => req.body._csrf,
+  // __HOST and __SECURE are blocked in chrome, change name
+  cookieName: '__APP-psfi.x-csrf-token',
 })
 
 /* USING EJS */
@@ -64,6 +74,10 @@ app.use(
   })
 )
 
+app.use(cookieParser('supersecret'))
+app.use(csrfProtection.doubleCsrfProtection)
+app.use(flash())
+
 app.use((req, res, next) => {
   /* WITH MONGOOSE */
   if (req?.session?.user?._id) {
@@ -94,6 +108,12 @@ app.use((req, res, next) => {
   //     next()
   //   })
   //   .catch(console.error)
+})
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn
+  res.locals.csrfToken = req.csrfToken()
+  next()
 })
 
 /* USING SEQUELIZE */
@@ -141,18 +161,18 @@ app.use(errorController.pageNotFound)
 mongoose
   .connect(process.env.MONGO_URI)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: 'Felix',
-          email: 'felix@example.com',
-          cart: {
-            items: [],
-          },
-        })
-        user.save()
-      }
-    })
+    // User.findOne().then((user) => {
+    //   if (!user) {
+    //     const user = new User({
+    //       name: 'Felix',
+    //       email: 'felix@example.com',
+    //       cart: {
+    //         items: [],
+    //       },
+    //     })
+    //     user.save()
+    //   }
+    // })
     app.listen(3000)
   })
   .catch(console.error)

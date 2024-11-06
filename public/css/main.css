@@ -219,7 +219,35 @@ form {
   color: white;
 }
 
+.user-message {
+  margin: auto;
+  width: 90%;
+  background-color: #b9c9ff;
+  border: 1px solid #4771fa;
+  border-radius: 3px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.user-message--error {
+  background-color: #9e0b0b;
+  border: 1px solid #9e0b0b;
+}
+
+.user-message p {
+  color: black;
+  font-weight: bold;
+}
+
+.user-message--error p {
+  color: white;
+}
+
 @media (min-width: 768px) {
+  .user-message {
+    width: 30rem;
+  }
+
   .main-header__nav {
     display: flex;
   }

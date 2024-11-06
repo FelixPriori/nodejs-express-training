@@ -39,3 +39,10 @@ Basic overview over [Express.js](https://expressjs.com/)
 
 - Using [express-session](https://www.npmjs.com/package/express-session) for creating session
 - Using [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session) for storing session in MongoDB
+
+### Authentication
+
+- Using [bcrypyjs](https://www.npmjs.com/package/bcryptjs) to encrypt and decrypt user password
+- Route protection for logged out users
+- Protecting against [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) Attacks with [csrf-csrf](https://www.npmjs.com/package/csrf-csrf)
+- Show user a feedback message with [connect-flash](https://www.npmjs.com/package/connect-flash) when authentication fails

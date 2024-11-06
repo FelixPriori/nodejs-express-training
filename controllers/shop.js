@@ -10,7 +10,6 @@ exports.getIndex = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/',
-        isAuthenticated: req.session.isLoggedIn,
       })
     })
     .catch(console.error)
@@ -46,7 +45,6 @@ exports.getProducts = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/products',
-        isAuthenticated: req.session.isLoggedIn,
       })
     })
     .catch(console.error)
@@ -87,7 +85,6 @@ exports.getProduct = (req, res, next) => {
         product,
         pageTitle: product.title,
         path: '/products',
-        isAuthenticated: req.session.isLoggedIn,
       })
     })
     .catch(console.error)
@@ -117,7 +114,6 @@ exports.getCart = (req, res, next) => {
     products,
     pageTitle: 'Cart',
     path: '/cart',
-    isAuthenticated: req.session.isLoggedIn,
   })
 
   /* WITH SEQUELIZE */
@@ -206,7 +202,6 @@ exports.getCheckout = (req, res, next) => {
   res.render('shop/checkout', {
     pageTitle: 'Checkout',
     path: '/checkout',
-    isAuthenticated: req.session.isLoggedIn,
   })
 }
 
@@ -217,7 +212,6 @@ exports.getOrders = (req, res, next) => {
       orders,
       pageTitle: 'Your Orders',
       path: '/orders',
-      isAuthenticated: req.session.isLoggedIn,
     })
   })
 

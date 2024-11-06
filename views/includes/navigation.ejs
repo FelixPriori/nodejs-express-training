@@ -43,6 +43,7 @@
       <% if (isAuthenticated) {%>
       <li class="main-header__auth-item">
         <form action="/logout" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button type="submit" class="main-header__nav-link">Logout</button>
         </form>
       </li>
@@ -51,6 +52,11 @@
       <li class="main-header__auth-item">
         <a class="<%= path === '/login' ? 'active' : '' %>" href="/login">
           Login
+        </a>
+      </li>
+      <li class="main-header__auth-item">
+        <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup">
+          Signup
         </a>
       </li>
       <% } %>

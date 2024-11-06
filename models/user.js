@@ -175,6 +175,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    password: {
+      type: String,
+      required: true,
+    },
     cart: {
       items: [
         {
@@ -195,7 +199,7 @@ const userSchema = new Schema(
 
         const cartProductIndex = updatedCartItems.findIndex(
           (cartProduct) =>
-            cartProduct.productId.toString() === product._id.toString()
+            cartProduct.productId._id.toString() === product._id.toString()
         )
 
         let newQuantity = 1
@@ -218,7 +222,8 @@ const userSchema = new Schema(
       },
       deleteItemFromCart(productId) {
         const updatedCartItems = this.cart.items.filter(
-          (cartItem) => cartItem.productId.toString() !== productId.toString()
+          (cartItem) =>
+            cartItem.productId._id.toString() !== productId.toString()
         )
 
         const updatedCart = {
