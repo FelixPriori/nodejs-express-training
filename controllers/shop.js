@@ -10,6 +10,7 @@ exports.getIndex = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/',
+        isAuthenticated: req.session.isLoggedIn,
       })
     })
     .catch(console.error)
@@ -45,6 +46,7 @@ exports.getProducts = (req, res, next) => {
         products,
         pageTitle: 'Shop',
         path: '/products',
+        isAuthenticated: req.session.isLoggedIn,
       })
     })
     .catch(console.error)
@@ -85,6 +87,7 @@ exports.getProduct = (req, res, next) => {
         product,
         pageTitle: product.title,
         path: '/products',
+        isAuthenticated: req.session.isLoggedIn,
       })
     })
     .catch(console.error)
@@ -106,20 +109,16 @@ exports.getProduct = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   /* WITH MONGODB */
-  req.user
-    .populate('cart.items.productId')
-    .then((user) => {
-      const products = user.cart.items.map((product) => ({
-        quantity: product.quantity,
-        ...product.productId._doc,
-      }))
-      res.render('shop/cart', {
-        products,
-        pageTitle: 'Cart',
-        path: '/cart',
-      })
-    })
-    .catch(console.error)
+  const products = req.user.cart.items.map((product) => ({
+    quantity: product.quantity,
+    ...product.productId._doc,
+  }))
+  res.render('shop/cart', {
+    products,
+    pageTitle: 'Cart',
+    path: '/cart',
+    isAuthenticated: req.session.isLoggedIn,
+  })
 
   /* WITH SEQUELIZE */
   // req.user
@@ -207,6 +206,7 @@ exports.getCheckout = (req, res, next) => {
   res.render('shop/checkout', {
     pageTitle: 'Checkout',
     path: '/checkout',
+    isAuthenticated: req.session.isLoggedIn,
   })
 }
 
@@ -217,6 +217,7 @@ exports.getOrders = (req, res, next) => {
       orders,
       pageTitle: 'Your Orders',
       path: '/orders',
+      isAuthenticated: req.session.isLoggedIn,
     })
   })
 

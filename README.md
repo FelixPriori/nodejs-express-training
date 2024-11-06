@@ -12,7 +12,7 @@ Basic overview over [Express.js](https://expressjs.com/)
 
 - [Pug](https://pugjs.org/api/getting-started.html)
 - [Handlebars](https://handlebarsjs.com/)
-- [EJS](https://ejs.co/)
+- [EJS](https://ejs.co/) (in use)
 
 ### MVC
 
@@ -23,7 +23,7 @@ Basic overview over [Express.js](https://expressjs.com/)
 - Routing using route params & queries
 - CRUD operations with a local JSON file
 
-### Databases
+### Databases Overview
 
 #### SQL
 
@@ -33,4 +33,9 @@ Basic overview over [Express.js](https://expressjs.com/)
 #### NoSQL
 
 - [MongoDB](https://www.mongodb.com/)
-- [Mongoose ODM](https://mongoosejs.com/)
+- [Mongoose ODM](https://mongoosejs.com/) (in use)
+
+### Cookies & Sessions
+
+- Using [express-session](https://www.npmjs.com/package/express-session) for creating session
+- Using [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session) for storing session in MongoDB

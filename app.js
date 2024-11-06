@@ -1,9 +1,16 @@
 const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
+const session = require('express-session')
+const MongoDBStore = require('connect-mongodb-session')(session)
+
+const app = express()
+const store = new MongoDBStore({
+  uri: process.env.MONGO_URI,
+  collection: 'sessions',
+})
 
 /* USING EJS */
-const app = express()
 app.set('view engine', 'ejs')
 app.set('views', 'views')
 
@@ -32,6 +39,7 @@ const User = require('./models/user')
 
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
+const authRoutes = require('./routes/auth')
 
 const errorController = require('./controllers/error')
 
@@ -47,15 +55,28 @@ const errorController = require('./controllers/error')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store,
+  })
+)
+
 app.use((req, res, next) => {
-  /* USING MONGOOSE */
-  const userId = '672a37f0e2906079a18b4ee0'
-  User.findById(userId)
-    .then((user) => {
-      req.user = user
-      next()
-    })
-    .catch(console.error)
+  /* WITH MONGOOSE */
+  if (req?.session?.user?._id) {
+    User.findById(req.session.user._id)
+      .populate('cart.items.productId')
+      .then((user) => {
+        req.user = user
+        next()
+      })
+      .catch(console.error)
+  } else {
+    next()
+  }
 
   /* USING MONGODB */
   // const userId = '6728e4e9215d9bba56c99554'
@@ -105,8 +126,10 @@ app.use((req, res, next) => {
 //   })
 //   .then(app.listen(3000))
 //   .catch(console.error)
+
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
+app.use(authRoutes)
 app.use(errorController.pageNotFound)
 
 /* USING MONGODB */
