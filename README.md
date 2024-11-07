@@ -46,3 +46,7 @@ Basic overview over [Express.js](https://expressjs.com/)
 - Route protection for logged out users
 - Protecting against [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) Attacks with [csrf-csrf](https://www.npmjs.com/package/csrf-csrf)
 - Show user a feedback message with [connect-flash](https://www.npmjs.com/package/connect-flash) when authentication fails
+
+### Email
+
+Using [@sendgrid/mail](https://www.npmjs.com/package/@sendgrid/mail), the official package for [SendGrid](https://sendgrid.com/en-us) to send confirmation emails after registering

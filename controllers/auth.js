@@ -1,5 +1,6 @@
-const User = require('../models/user')
 const bcrypt = require('bcryptjs')
+const sgMail = require('@sendgrid/mail')
+const User = require('../models/user')
 
 exports.getLogin = (req, res, next) => {
   const [errorMessage] = req.flash('error')
@@ -84,7 +85,18 @@ exports.postSignup = (req, res, next) => {
           })
           return newUser.save()
         })
-        .then(() => res.redirect('/login'))
+        .then(() => {
+          res.redirect('/login')
+          sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+          return sgMail.send({
+            to: email,
+            from: process.env.SENDGRID_FROM,
+            subject: `Thank you ${name}!`,
+            text: 'You sucessfully signed up for the NodeJs course shop!',
+            html: '<h1>You sucessfully signed up for the NodeJs course shop!</h1>',
+          })
+        })
+        .catch(console.error)
     })
     .catch(console.error)
 }
