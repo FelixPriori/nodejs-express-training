@@ -14,7 +14,7 @@ const store = new MongoDBStore({
 })
 
 const csrfProtection = csrf({
-  getSecret: () => 'supersecret',
+  getSecret: () => process.env.CSRF_CSRF_SECRET,
   getTokenFromRequest: (req) => req.body._csrf,
   // __HOST and __SECURE are blocked in chrome, change name
   cookieName: '__APP-psfi.x-csrf-token',
@@ -74,7 +74,7 @@ app.use(
   })
 )
 
-app.use(cookieParser('supersecret'))
+app.use(cookieParser(process.env.CSRF_CSRF_SECRET))
 app.use(csrfProtection.doubleCsrfProtection)
 app.use(flash())
 
