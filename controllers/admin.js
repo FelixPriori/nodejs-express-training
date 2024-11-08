@@ -126,13 +126,15 @@ exports.postEditProduct = (req, res, next) => {
   /* WITH MONGOOSE */
   Product.findById(productId)
     .then((product) => {
+      if (product.userId.toString() !== req.user._id.toString()) {
+        return res.redirect('/')
+      }
       product.title = title
       product.price = price
       product.description = description
       product.imageUrl = imageUrl
-      return product.save()
+      return product.save().then(() => res.redirect('/admin/products'))
     })
-    .then(() => res.redirect('/admin/products'))
     .catch(console.error)
 
   /* WITH MONGODB */
@@ -168,7 +170,7 @@ exports.postDeleteProduct = (req, res, next) => {
   const { productId } = req.body
 
   /* WITH MONGOOSE */
-  Product.findByIdAndDelete(productId)
+  Product.deleteOne({ _id: productId, userId: req.user._id })
     .then(() => {
       res.redirect('/admin/products')
     })
@@ -195,7 +197,7 @@ exports.postDeleteProduct = (req, res, next) => {
 
 exports.getAdminProducts = (req, res, next) => {
   /* WITH MONGOOSE */
-  Product.find()
+  Product.find({ userId: req.user._id })
     .then((products) => {
       res.render('admin/products', {
         products,

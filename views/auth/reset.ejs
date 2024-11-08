@@ -6,23 +6,15 @@
     <body>
         <%- include('../includes/navigation.ejs') %>
         <main>
-          <h1 class="centered">Login</h1>
+          <h1 class="centered">Reset Password</h1>
           <%- include('../includes/error-message.ejs') %>
-          <form class="login-form" action="/login" method="post">
+          <form class="login-form" action="/reset" method="post">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="form-control">
                 <label for="email">Email</label>
                 <input type="email" name="email" id="email">
             </div>
-            <div class="form-control">
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password">
-            </div>
-
-            <button class="btn" type="submit">Login</button>
+            <button class="btn" type="submit">Reset Password</button>
         </form>
-        <div class="centered">
-          <a href="/reset">Forgot your password?</a>
-        </div>
         </main>
         <%- include('../includes/end.ejs') %>

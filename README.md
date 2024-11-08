@@ -46,7 +46,12 @@ Basic overview over [Express.js](https://expressjs.com/)
 - Route protection for logged out users
 - Protecting against [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) Attacks with [csrf-csrf](https://www.npmjs.com/package/csrf-csrf)
 - Show user a feedback message with [connect-flash](https://www.npmjs.com/package/connect-flash) when authentication fails
+- User registration flow (register, login, logout, reset password)
 
 ### Email
 
-Using [@sendgrid/mail](https://www.npmjs.com/package/@sendgrid/mail), the official package for [SendGrid](https://sendgrid.com/en-us) to send confirmation emails after registering
+Using [@sendgrid/mail](https://www.npmjs.com/package/@sendgrid/mail), the official package for [SendGrid](https://sendgrid.com/en-us) to send confirmation emails after registering, to send a reset password link and an updated password confirmation.
+
+### Authorization
+
+Add authorization so that users cannot have access to editing, deleting or getting products that they have not created through their admin console.
