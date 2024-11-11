@@ -12,16 +12,38 @@
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="form-control">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email">
+                <input 
+                  type="email" 
+                  name="email" 
+                  id="email" 
+                  value="<%= formValues.email %>"
+                  class="<%= validationErrors.email ? 'invalid' : '' %>" 
+                  aria-invalid="<%= !!validationErrors.email %>"
+                  aria-describedby="emailError"
+                >
+                <% if (validationErrors.email) { %>
+                  <p id="emailError"><%= validationErrors.email.msg %></p>
+                <% } %>
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  value="<%= formValues.password %>"
+                  class="<%= validationErrors.password ? 'invalid' : '' %>" 
+                  aria-invalid="<%= !!validationErrors.password %>"
+                  aria-describedby="passwordError"
+                >
+                <% if (validationErrors.password) { %>
+                  <p id="passwordError"><%= validationErrors.password.msg %></p>
+                <% } %>
             </div>
 
             <button class="btn" type="submit">Login</button>
         </form>
-        <div class="centered">
+        <div class="centered forgot-password">
           <a href="/reset">Forgot your password?</a>
         </div>
         </main>

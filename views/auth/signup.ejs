@@ -8,23 +8,67 @@
         <main>
           <h1 class="centered">Signup</h1>
           <%- include('../includes/error-message.ejs') %>
-          <form class="signup-form" action="/signup" method="post">
+          <form class="signup-form" action="/signup" method="post" novalidate>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="form-control">
               <label for="name">Name</label>
-              <input type="name" name="name" id="name">
+              <input
+                class="<%= validationErrors.name ? 'invalid' : '' %>"
+                type="name" 
+                name="name" 
+                id="name"
+                value="<%= formValues.name %>"
+                aria-invalid="<%= !!validationErrors.name %>"
+                aria-describedby="nameError"
+              >
+              <% if (validationErrors.name) { %>
+                <p id="nameError"><%= validationErrors.name.msg %></p>
+              <% } %>
             </div>
             <div class="form-control">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email">
+                <input 
+                  type="email" 
+                  name="email" 
+                  id="email" 
+                  value="<%= formValues.email %>"
+                  class="<%= validationErrors.email ? 'invalid' : '' %>" 
+                  aria-invalid="<%= !!validationErrors.email %>"
+                  aria-describedby="emailError"
+                >
+                <% if (validationErrors.email) { %>
+                  <p id="emailError"><%= validationErrors.email.msg %></p>
+                <% } %>
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input 
+                  type="password" 
+                  name="password" 
+                  id="password" 
+                  value="<%= formValues.password %>"
+                  class="<%= validationErrors.password ? 'invalid' : '' %>" 
+                  aria-invalid="<%= !!validationErrors.password %>"
+                  aria-describedby="passwordError"
+                >
+                <% if (validationErrors.password) { %>
+                  <p id="passwordError"><%= validationErrors.password.msg %></p>
+                <% } %>
             </div>
             <div class="form-control">
               <label for="confirmPassword">Confirm Password</label>
-              <input type="password" name="confirmPassword" id="confirmPassword">
+              <input
+                class="<%= validationErrors.confirmPassword ? 'invalid' : '' %>" 
+                type="password" 
+                name="confirmPassword" 
+                id="confirmPassword" 
+                value="<%= formValues.confirmPassword %>"
+                aria-invalid="<%= !!validationErrors.confirmPassword %>"
+                aria-describedby="confirmPasswordError"
+              >
+              <% if (validationErrors.confirmPassword) { %>
+                <p id="confirmPasswordError"><%= validationErrors.confirmPassword.msg %></p>
+              <% } %>
           </div>
             <button class="btn" type="submit">Signup</button>
         </form>

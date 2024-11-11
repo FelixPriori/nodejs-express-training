@@ -1,5 +1,7 @@
 const { productNotFound } = require('./error')
 const Product = require('../models/product')
+const { validationResult } = require('express-validator')
+const { createValidationObject } = require('../util/formValidation')
 
 exports.getAddProducts = (req, res, next) => {
   const editMode = req.query.edit
@@ -12,6 +14,14 @@ exports.getAddProducts = (req, res, next) => {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
     editing: editMode,
+    errorMessage: '',
+    formValues: {
+      title: '',
+      description: '',
+      price: '',
+      imageUrl: '',
+    },
+    validationErrors: [],
   })
 }
 
@@ -20,6 +30,24 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl =
     'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
   // const imageUrl = req.body.imageUrl
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const validationErrors = createValidationObject(errors.array())
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      errorMessage: errors.array().map(({ msg }) => msg),
+      formValues: {
+        title,
+        description,
+        price,
+        imageUrl,
+      },
+      validationErrors,
+    })
+  }
 
   /* WITH MONGOOSE */
   const product = new Product({
@@ -91,11 +119,21 @@ exports.getEditProduct = (req, res, next) => {
         productNotFound(res)
       }
 
+      const { title, description, price, imageUrl } = product
+
       res.render('admin/edit-product', {
         product,
         pageTitle: 'Edit Product',
         path: '/admin/products',
         editing: editMode,
+        errorMessage: '',
+        formValues: {
+          title,
+          description,
+          price,
+          imageUrl,
+        },
+        validationErrors: [],
       })
     })
     .catch(console.error)
@@ -128,6 +166,24 @@ exports.postEditProduct = (req, res, next) => {
     .then((product) => {
       if (product.userId.toString() !== req.user._id.toString()) {
         return res.redirect('/')
+      }
+      const errors = validationResult(req)
+      if (!errors.isEmpty()) {
+        const validationErrors = createValidationObject(errors.array())
+        return res.status(422).render('admin/edit-product', {
+          product,
+          pageTitle: 'Edit Product',
+          path: '/admin/add-product',
+          editing: true,
+          errorMessage: errors.array().map(({ msg }) => msg),
+          formValues: {
+            title,
+            description,
+            price,
+            imageUrl,
+          },
+          validationErrors,
+        })
       }
       product.title = title
       product.price = price

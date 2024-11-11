@@ -55,3 +55,8 @@ Using [@sendgrid/mail](https://www.npmjs.com/package/@sendgrid/mail), the offici
 ### Authorization
 
 Add authorization so that users cannot have access to editing, deleting or getting products that they have not created through their admin console.
+
+### Form Validation
+
+- Use [express-validator](https://express-validator.github.io/docs) to validate inputs on submit.
+- Improve UX by keeping the form data when submitting with an error instead of wiping the form

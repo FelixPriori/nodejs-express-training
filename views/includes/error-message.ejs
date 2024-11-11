@@ -1,5 +1,11 @@
 <%if (errorMessage) {%>
 <div class="user-message user-message--error">
-  <p><%= errorMessage %></p>
+  <% if (Array.isArray(errorMessage) && errorMessage.length > 1) { %> 
+    <% errorMessage.forEach((message) => {%>
+      <p><%= message %></p>
+    <% }) %> 
+  <% } else { %>
+    <p><%= errorMessage %></p>
+  <%}%>
 </div>
-<%}%>
+<% }%>
