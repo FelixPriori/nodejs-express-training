@@ -4,6 +4,7 @@ const User = require('../models/user')
 const crypto = require('crypto')
 const { validationResult } = require('express-validator')
 const { createValidationObject } = require('../util/formValidation')
+const { makeNewServerError } = require('../util/error')
 
 exports.getLogin = (req, res, next) => {
   const [errorMessage] = req.flash('error')
@@ -87,7 +88,10 @@ exports.postLogin = (req, res, next) => {
           })
         })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 }
 
 exports.postLogout = (req, res, next) => {
@@ -163,7 +167,10 @@ exports.postSignup = (req, res, next) => {
         html: '<h1>You sucessfully signed up for the NodeJs course shop!</h1>',
       })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 }
 
 exports.getReset = (req, res, next) => {
@@ -180,8 +187,8 @@ exports.getReset = (req, res, next) => {
 
 exports.postReset = (req, res, next) => {
   const { email } = req.body
-  const errors = validationResult(req)
 
+  const errors = validationResult(req)
   if (!errors.isEmpty()) {
     return res.status(422).render('auth/reset', {
       path: '/reset',
@@ -224,7 +231,10 @@ exports.postReset = (req, res, next) => {
             `,
         })
       })
-      .catch(console.error)
+      .catch((error) => {
+        const newError = makeNewServerError(error)
+        return next(newError)
+      })
   })
 }
 
@@ -257,7 +267,10 @@ exports.getNewPassword = (req, res, next) => {
       req.flash('error', 'Token expired. Try again.')
       return res.redirect('/reset')
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 }
 
 exports.postNewPassword = (req, res, next) => {
@@ -304,10 +317,16 @@ exports.postNewPassword = (req, res, next) => {
               html: '<h1>You have sucessfully updated your password!</h1>',
             })
           })
-          .catch(console.error)
+          .catch((error) => {
+            const newError = makeNewServerError(error)
+            return next(newError)
+          })
       }
       req.flash('error', 'Token expired. Try again.')
       return res.redirect('/reset')
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 }

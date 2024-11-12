@@ -1,6 +1,7 @@
 const Product = require('../models/product')
 const Order = require('../models/order')
 const { productNotFound } = require('./error')
+const { makeNewServerError } = require('../util/error')
 
 exports.getIndex = (req, res, next) => {
   /* WITH MONGOOSE */
@@ -12,7 +13,10 @@ exports.getIndex = (req, res, next) => {
         path: '/',
       })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // Product.fetchAll()
@@ -47,7 +51,10 @@ exports.getProducts = (req, res, next) => {
         path: '/products',
       })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // Product.fetchAll()
@@ -87,7 +94,10 @@ exports.getProduct = (req, res, next) => {
         path: '/products',
       })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH SEQUELIZE */
   // Product.findByPk(productId)
@@ -143,7 +153,10 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product)
     })
     .then(() => res.redirect('/cart'))
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* USING SEQUELIZE */
   // req.user
@@ -180,7 +193,10 @@ exports.postCartDeleteProduct = (req, res, next) => {
   req.user
     .deleteItemFromCart(productId)
     .then(() => res.redirect('/cart'))
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH SEQUELIZE */
   // req.user
@@ -262,7 +278,10 @@ exports.postOrder = (req, res, next) => {
     })
     .then(() => req.user.clearCart())
     .then(() => res.redirect('/orders'))
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // req.user

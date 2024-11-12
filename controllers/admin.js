@@ -2,6 +2,7 @@ const { productNotFound } = require('./error')
 const Product = require('../models/product')
 const { validationResult } = require('express-validator')
 const { createValidationObject } = require('../util/formValidation')
+const { makeNewServerError } = require('../util/error')
 
 exports.getAddProducts = (req, res, next) => {
   const editMode = req.query.edit
@@ -62,7 +63,27 @@ exports.postAddProduct = (req, res, next) => {
     .then(() => {
       return res.redirect('/admin/products')
     })
-    .catch(console.error)
+    .catch((error) => {
+      /* ERROR HANDLING */
+      /* OPTION 1 */
+      // res.redirect('/500')
+      /* OPTION 2 */
+      // return res.status(500).render('admin/edit-product', {
+      //   pageTitle: 'Add Product',
+      //   path: '/admin/add-product',
+      //   editing: false,
+      //   errorMessage: 'Database operation failed, please try again.',
+      //   formValues: {
+      //     title,
+      //     description,
+      //     price,
+      //     imageUrl,
+      //   },
+      //   validationErrors: [],
+      // })
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // const product = new Product(
@@ -136,7 +157,10 @@ exports.getEditProduct = (req, res, next) => {
         validationErrors: [],
       })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH SEQUELIZE */
   // req.user
@@ -191,7 +215,10 @@ exports.postEditProduct = (req, res, next) => {
       product.imageUrl = imageUrl
       return product.save().then(() => res.redirect('/admin/products'))
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // const product = new Product(title, price, description, imageUrl, productId)
@@ -230,7 +257,10 @@ exports.postDeleteProduct = (req, res, next) => {
     .then(() => {
       res.redirect('/admin/products')
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // Product.deleteById(productId)
@@ -261,7 +291,10 @@ exports.getAdminProducts = (req, res, next) => {
         path: '/admin/products',
       })
     })
-    .catch(console.error)
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 
   /* WITH MONGODB */
   // Product.fetchAll()

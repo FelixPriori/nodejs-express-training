@@ -6,6 +6,7 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const { doubleCsrf: csrf } = require('csrf-csrf')
 const cookieParser = require('cookie-parser')
 const flash = require('connect-flash')
+const { makeNewServerError } = require('./util/error')
 
 const app = express()
 const store = new MongoDBStore({
@@ -84,10 +85,16 @@ app.use((req, res, next) => {
     User.findById(req.session.user._id)
       .populate('cart.items.productId')
       .then((user) => {
+        if (!user) {
+          return next()
+        }
         req.user = user
         next()
       })
-      .catch(console.error)
+      .catch((error) => {
+        const newError = makeNewServerError(error)
+        return next(newError)
+      })
   } else {
     next()
   }
@@ -150,7 +157,11 @@ app.use((req, res, next) => {
 app.use('/admin', adminRoutes)
 app.use(shopRoutes)
 app.use(authRoutes)
+app.get('/500', errorController.serverError)
 app.use(errorController.pageNotFound)
+app.use((error, req, res, next) => {
+  res.redirect('/500')
+})
 
 /* USING MONGODB */
 // mongoConnect(() => {

@@ -60,3 +60,8 @@ Add authorization so that users cannot have access to editing, deleting or getti
 
 - Use [express-validator](https://express-validator.github.io/docs) to validate inputs on submit.
 - Improve UX by keeping the form data when submitting with an error instead of wiping the form
+
+### Error Handling
+
+- Add a 500.ejs file in the views folder
+- Use express.js's [error handling middleware](https://expressjs.com/en/guide/error-handling.html) to redirect users to the 500 page when reaching a the catch block.
