@@ -344,3 +344,27 @@ exports.getAdminProducts = (req, res, next) => {
   //   })
   //   .catch(console.error)
 }
+
+exports.deleteProduct = (req, res, next) => {
+  const { productId } = req.params
+
+  /* WITH MONGOOSE */
+  Product.findById(productId)
+    .then((product) => {
+      if (!product) {
+        return next(new Error('Product not found.'))
+      }
+      deleteFile(product.imageUrl)
+      return Product.deleteOne({ _id: productId, userId: req.user._id })
+    })
+    .then(() => {
+      return res.status(200).json({
+        message: 'Success!',
+      })
+    })
+    .catch((error) => {
+      return res.status(500).json({
+        message: 'Delete product failed.',
+      })
+    })
+}

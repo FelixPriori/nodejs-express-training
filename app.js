@@ -17,7 +17,14 @@ const store = new MongoDBStore({
 
 const csrfProtection = csrf({
   getSecret: () => process.env.CSRF_CSRF_SECRET,
-  getTokenFromRequest: (req) => req.body._csrf,
+  getTokenFromRequest: (req) => {
+    if (req.body._csrf) {
+      return req.body._csrf
+    }
+    if (req.get('csrf-token') !== '') {
+      return req.get('csrf-token')
+    }
+  },
   // __HOST and __SECURE are blocked in chrome, change name
   cookieName: '__APP-psfi.x-csrf-token',
 })

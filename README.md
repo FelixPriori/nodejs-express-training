@@ -82,3 +82,7 @@ Use [PDFKit](https://pdfkit.org/) to create PDF with order details and stream fi
 ### Pagination
 
 Implement pagination from scratch on index and product list pages.
+
+### Client-side javascript
+
+Delete a product using javascript on the client side and update the DOM to avoid page reload and improve UX.
