@@ -24,15 +24,44 @@
   padding: 0;
 }
 
-.order__product-item {
+.order__link-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.order__link {
+  text-align: center;
+}
+
+.order__divider {
+  margin-top: 1rem;
+  min-width: 75%;
+  min-height: 1px;
+  background-color: #00695c;
+}
+
+.order__total {
   display: flex;
   justify-content: space-between;
+}
+
+.order__total p {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.order__product-item {
+  display: flex;
   align-items: baseline;
+  justify-content: flex-start;
   gap: 2rem;
+  width: 100%;
 }
 
 .order__product-item-title {
 }
 
 .order__product-item-price {
+  margin-left: auto;
 }

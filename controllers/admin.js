@@ -3,6 +3,7 @@ const Product = require('../models/product')
 const { validationResult } = require('express-validator')
 const { createValidationObject } = require('../util/formValidation')
 const { makeNewServerError } = require('../util/error')
+const { deleteFile } = require('../util/file')
 
 exports.getAddProducts = (req, res, next) => {
   const editMode = req.query.edit
@@ -20,7 +21,8 @@ exports.getAddProducts = (req, res, next) => {
       title: '',
       description: '',
       price: '',
-      imageUrl: '',
+      // imageUrl: '',
+      image: '',
     },
     validationErrors: [],
   })
@@ -28,29 +30,37 @@ exports.getAddProducts = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const { title, description, price } = req.body
-  const imageUrl =
-    'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
+  const image = req.file
+  // const imageUrl =
+  //   'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
   // const imageUrl = req.body.imageUrl
-
   const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    const validationErrors = createValidationObject(errors.array())
+  const errorsArray = errors.array()
+
+  if (!image) {
+    errorsArray.push({ path: 'image', msg: 'Attached file is not an image' })
+  }
+
+  if (errorsArray.length > 0) {
+    const validationErrors = createValidationObject(errorsArray)
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
       path: '/admin/add-product',
       editing: false,
-      errorMessage: errors.array().map(({ msg }) => msg),
+      errorMessage: errorsArray.map(({ msg }) => msg),
       formValues: {
         title,
         description,
         price,
-        imageUrl,
+        // imageUrl,
+        image,
       },
       validationErrors,
     })
   }
 
   /* WITH MONGOOSE */
+  const imageUrl = image.path
   const product = new Product({
     title,
     price,
@@ -140,7 +150,7 @@ exports.getEditProduct = (req, res, next) => {
         productNotFound(res)
       }
 
-      const { title, description, price, imageUrl } = product
+      const { title, description, price, image /*,imageUrl*/ } = product
 
       res.render('admin/edit-product', {
         product,
@@ -152,7 +162,8 @@ exports.getEditProduct = (req, res, next) => {
           title,
           description,
           price,
-          imageUrl,
+          // imageUrl,
+          image,
         },
         validationErrors: [],
       })
@@ -182,8 +193,9 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, description, price } = req.body
-  const imageUrl =
-    'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
+  const image = req.file
+  // const imageUrl =
+  //   'https://cdn.pixabay.com/photo/2016/03/31/20/51/book-1296045_960_720.png'
 
   /* WITH MONGOOSE */
   Product.findById(productId)
@@ -192,19 +204,22 @@ exports.postEditProduct = (req, res, next) => {
         return res.redirect('/')
       }
       const errors = validationResult(req)
-      if (!errors.isEmpty()) {
-        const validationErrors = createValidationObject(errors.array())
+      const errorsArray = errors.array()
+
+      if (errorsArray.length > 0) {
+        const validationErrors = createValidationObject(errorsArray)
         return res.status(422).render('admin/edit-product', {
           product,
           pageTitle: 'Edit Product',
           path: '/admin/add-product',
           editing: true,
-          errorMessage: errors.array().map(({ msg }) => msg),
+          errorMessage: errorsArray.map(({ msg }) => msg),
           formValues: {
             title,
             description,
             price,
-            imageUrl,
+            // imageUrl,
+            image,
           },
           validationErrors,
         })
@@ -212,7 +227,10 @@ exports.postEditProduct = (req, res, next) => {
       product.title = title
       product.price = price
       product.description = description
-      product.imageUrl = imageUrl
+      if (image) {
+        deleteFile(product.imageUrl)
+        product.imageUrl = image.path
+      }
       return product.save().then(() => res.redirect('/admin/products'))
     })
     .catch((error) => {
@@ -253,7 +271,14 @@ exports.postDeleteProduct = (req, res, next) => {
   const { productId } = req.body
 
   /* WITH MONGOOSE */
-  Product.deleteOne({ _id: productId, userId: req.user._id })
+  Product.findById(productId)
+    .then((product) => {
+      if (!product) {
+        return next(new Error('Product not found.'))
+      }
+      deleteFile(product.imageUrl)
+      return Product.deleteOne({ _id: productId, userId: req.user._id })
+    })
     .then(() => {
       res.redirect('/admin/products')
     })

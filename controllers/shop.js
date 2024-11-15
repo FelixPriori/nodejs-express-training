@@ -2,6 +2,9 @@ const Product = require('../models/product')
 const Order = require('../models/order')
 const { productNotFound } = require('./error')
 const { makeNewServerError } = require('../util/error')
+const fs = require('fs')
+const path = require('path')
+const PDFDocument = require('pdfkit')
 
 exports.getIndex = (req, res, next) => {
   /* WITH MONGOOSE */
@@ -317,4 +320,78 @@ exports.postOrder = (req, res, next) => {
   //   })
   //   .then(() => res.redirect('/orders'))
   //   .catch(console.error)
+}
+
+exports.getInvoice = (req, res, next) => {
+  const { orderId } = req.params
+
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        const newError = new Error('No order found.')
+        newError.httpStatusCode = 404
+        return next(newError)
+      }
+
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        const newError = new Error('Unauthorized')
+        newError.httpStatusCode = 401
+        return next(newError)
+      }
+
+      const invoiceName = 'invoice-' + orderId + '.pdf'
+      const invoicePath = path.join('data', 'invoices', invoiceName)
+
+      /* USING PDFKIT */
+      const pdfDoc = new PDFDocument()
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="' + invoiceName + '"'
+      )
+      pdfDoc.pipe(fs.createWriteStream(invoicePath))
+      pdfDoc.pipe(res)
+      pdfDoc
+        .fontSize(26)
+        .text(`Invoice #${orderId}`, { underline: true, align: 'center' })
+      let totalPrice = 0
+      const productList = order.products.map((product) => {
+        totalPrice += product.productData.price * product.quantity
+        return `${product.productData.title} (${product.quantity}): $${
+          product.productData.price * product.quantity
+        }`
+      })
+      pdfDoc.moveDown()
+      pdfDoc.fontSize(20).text('Products:')
+      pdfDoc.fontSize(16).list(productList, { bulletRadius: 3 })
+      pdfDoc.moveDown()
+      pdfDoc.fontSize(20).text(`Total price: $${totalPrice}`)
+      pdfDoc.end()
+
+      /* STREAMING A FILE */
+      // const file = fs.createReadStream(invoicePath)
+      // res.setHeader('Content-Type', 'application/pdf')
+      // res.setHeader(
+      //   'Content-Disposition',
+      //   'attachment; filename="' + invoiceName + '"'
+      // )
+      // file.pipe(res)
+
+      /* READING A FILE */
+      // fs.readFile(invoicePath, (error, data) => {
+      //   if (error) {
+      //     return next(error)
+      //   }
+      // res.setHeader('Content-Type', 'application/pdf')
+      // res.setHeader(
+      //   'Content-Disposition',
+      //   'attachment; filename="' + invoiceName + '"'
+      // )
+      //   res.send(data)
+      // })
+    })
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 }

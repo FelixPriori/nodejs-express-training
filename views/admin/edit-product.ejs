@@ -9,7 +9,12 @@
     <main>
           <h1 class="centered"><%= editing ? 'Edit' : 'Add' %> Product</h1>
           <%- include('../includes/error-message.ejs') %>
-          <form class="product-form" action="/admin/<%= editing ? 'edit-product' : 'add-product' %>" method="post">
+          <form 
+            class="product-form" 
+            action="/admin/<%= editing ? 'edit-product' : 'add-product' %>" 
+            method="post" 
+            enctype="multipart/form-data"
+          >
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="form-control">
                 <label for="title">Title</label>
@@ -27,6 +32,20 @@
                 <% } %>
             </div>
             <div class="form-control">
+                <label for="image">Image</label>
+                <input 
+                    type="file" 
+                    name="image" 
+                    id="image"
+                    class="<%= validationErrors.image ? 'invalid' : '' %>" 
+                    aria-invalid="<%= !!validationErrors.image %>"
+                    aria-describedby="imageError"
+                >
+                <% if (validationErrors.image) { %>
+                  <p id="imageError"><%= validationErrors.image.msg %></p>
+                <% } %>
+            </div>
+            <!-- <div class="form-control">
                 <label for="imageUrl">Image URL</label>
                 <input 
                     type="text" 
@@ -40,7 +59,7 @@
                 <% if (validationErrors.imageUrl) { %>
                   <p id="imageUrlError"><%= validationErrors.imageUrl.msg %></p>
                 <% } %>
-            </div>
+            </div> -->
             <div class="form-control">
                 <label for="price">Price</label>
                 <input 

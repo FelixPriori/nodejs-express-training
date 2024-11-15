@@ -11,7 +11,8 @@ const isAuth = require('../middleware/is-auth')
 const {
   createProductTitleChain,
   createProductPriceChain,
-  createProductImageUrlChain,
+  // createProductImageUrlChain,
+  createProductImageChain,
   createProductDescriptionChain,
 } = require('../util/formValidation')
 
@@ -28,7 +29,8 @@ router.post(
   [
     createProductTitleChain(),
     createProductPriceChain(),
-    createProductImageUrlChain(),
+    // createProductImageUrlChain(),
+    createProductImageChain(),
     createProductDescriptionChain(),
   ],
   adminController.postAddProduct
@@ -44,7 +46,8 @@ router.post(
   [
     createProductTitleChain(),
     createProductPriceChain(),
-    createProductImageUrlChain(),
+    // createProductImageUrlChain(),
+    createProductImageChain(),
     createProductDescriptionChain(),
   ],
   adminController.postEditProduct

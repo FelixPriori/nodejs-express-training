@@ -6,6 +6,7 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const { doubleCsrf: csrf } = require('csrf-csrf')
 const cookieParser = require('cookie-parser')
 const flash = require('connect-flash')
+const multer = require('multer')
 const { makeNewServerError } = require('./util/error')
 
 const app = express()
@@ -20,6 +21,28 @@ const csrfProtection = csrf({
   // __HOST and __SECURE are blocked in chrome, change name
   cookieName: '__APP-psfi.x-csrf-token',
 })
+
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images')
+  },
+  filename: (req, file, cb) => {
+    const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+    cb(null, uniquePrefix + '-' + file.originalname)
+  },
+})
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
+  ) {
+    cb(null, true)
+  } else {
+    cb(null, false)
+  }
+}
 
 /* USING EJS */
 app.set('view engine', 'ejs')
@@ -65,6 +88,8 @@ const errorController = require('./controllers/error')
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
+app.use('/images', express.static(path.join(__dirname, 'images')))
+app.use(multer({ storage: fileStorage, fileFilter }).single('image'))
 
 app.use(
   session({

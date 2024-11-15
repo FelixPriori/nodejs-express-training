@@ -69,6 +69,8 @@ exports.createProductPriceChain = () =>
 exports.createProductImageUrlChain = () =>
   body('imageUrl', 'You must enter an image for your product').isURL()
 
+exports.createProductImageChain = () => body('image')
+
 exports.createProductDescriptionChain = () =>
   body(
     'description',

@@ -65,3 +65,16 @@ Add authorization so that users cannot have access to editing, deleting or getti
 
 - Add a 500.ejs file in the views folder
 - Use express.js's [error handling middleware](https://expressjs.com/en/guide/error-handling.html) to redirect users to the 500 page when reaching a the catch block.
+
+### File Upload / Download
+
+## Image upload and serving
+
+- Use [multer](https://expressjs.com/en/resources/middleware/multer.html) middleware to store images in storage.
+- Filters for images only (jpeg, jpg, png).
+- Keep link to local image in database
+- Delete old image if a new image is uploaded or if product is deleted.
+
+## PDF download
+
+- Use [PDFKit](https://pdfkit.org/) to create PDF with order details and stream file to authorized user.

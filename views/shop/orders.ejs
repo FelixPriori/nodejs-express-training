@@ -21,6 +21,14 @@
                                     </li>
                                 <% }) %>
                             </ul>
+                            <div class="order__divider"></div>
+                            <div class="order__total">
+                                <p>Order total:</p>
+                                <p>$<%= order.products.reduce((a, current)=> a + current.productData.price * current.quantity, 0) %></p>
+                            </div>
+                            <div class="order__link-wrapper">
+                                <a class="order__link" href="/orders/<%= order._id%>">Download invoice</a>
+                            </div>
                         </li>
                     <% }) %>
                 </ul>
