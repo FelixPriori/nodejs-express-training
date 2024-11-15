@@ -68,13 +68,17 @@ Add authorization so that users cannot have access to editing, deleting or getti
 
 ### File Upload / Download
 
-## Image upload and serving
+#### Image upload and serving
 
 - Use [multer](https://expressjs.com/en/resources/middleware/multer.html) middleware to store images in storage.
 - Filters for images only (jpeg, jpg, png).
 - Keep link to local image in database
 - Delete old image if a new image is uploaded or if product is deleted.
 
-## PDF download
+#### PDF download
 
-- Use [PDFKit](https://pdfkit.org/) to create PDF with order details and stream file to authorized user.
+Use [PDFKit](https://pdfkit.org/) to create PDF with order details and stream file to authorized user.
+
+### Pagination
+
+Implement pagination from scratch on index and product list pages.
