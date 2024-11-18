@@ -5,6 +5,7 @@ const { makeNewServerError } = require('../util/error')
 const fs = require('fs')
 const path = require('path')
 const PDFDocument = require('pdfkit')
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 const ITEMS_PER_PAGE = 2
 
@@ -256,10 +257,52 @@ exports.postCartDeleteProduct = (req, res, next) => {
 }
 
 exports.getCheckout = (req, res, next) => {
-  res.render('shop/checkout', {
-    pageTitle: 'Checkout',
-    path: '/checkout',
+  let totalSum = 0
+
+  const products = req.user.cart.items.map((product) => {
+    const productSum = product.quantity * product.productId.price
+    totalSum += productSum
+    return {
+      quantity: product.quantity,
+      productSum,
+      ...product.productId._doc,
+    }
   })
+
+  const routePrefix = `${req.protocol}://${req.get('host')}/checkout`
+
+  stripe.checkout.sessions
+    .create({
+      payment_method_types: ['card'],
+      line_items: products.map((product) => ({
+        price_data: {
+          product_data: {
+            name: product.title,
+            description: product.description,
+          },
+          unit_amount: Math.trunc(product.price * 100),
+          currency: 'usd',
+        },
+        quantity: product.quantity,
+      })),
+      mode: 'payment',
+      success_url: `${routePrefix}/success`,
+      cancel_url: `${routePrefix}/cancel`,
+    })
+    .then((session) => {
+      res.render('shop/checkout', {
+        products,
+        pageTitle: 'Checkout',
+        path: '/checkout',
+        totalSum,
+        sessionId: session.id,
+        publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+      })
+    })
+    .catch((error) => {
+      const newError = makeNewServerError(error)
+      return next(newError)
+    })
 }
 
 exports.getOrders = (req, res, next) => {
@@ -297,7 +340,7 @@ exports.getOrders = (req, res, next) => {
   //   .catch(console.error)
 }
 
-exports.postOrder = (req, res, next) => {
+exports.getCheckoutSuccess = (req, res, next) => {
   /* WITH MONGOOSE */
   req.user
     .populate('cart.items.productId')

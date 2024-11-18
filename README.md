@@ -86,3 +86,12 @@ Implement pagination from scratch on index and product list pages.
 ### Client-side javascript
 
 Delete a product using javascript on the client side and update the DOM to avoid page reload and improve UX.
+
+### Payments
+
+Using [Stripe](https://stripe.com/en-ca), take payments from the users:
+
+- From cart, user may click a checkout button
+- From checkout page, user can review the products, and totals, and click on the order button
+- Ordering opens a checkout page hosted by Stripe
+- After completing the payment, user is redirected to a success page which will clear cart and add the order to the orders list
